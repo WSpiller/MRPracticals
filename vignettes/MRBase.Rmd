@@ -36,6 +36,10 @@ library(TwoSampleMR)
 
 Note that as the `MRInstruments` and `TwoSampleMR` R packages are hosted on Github, installation requires the `devtools` R package.
 
+```{r, warning=F, message=F, results='hide',echo=FALSE}
+BMIdat<-read.csv("BMIdat.csv",header=T)
+```
+
 ### MR Workflow
 
 The workflow for performing a two-sample summary MR is as follows:
@@ -70,12 +74,16 @@ exposure_gwas <- subset(gwas_catalog, grepl("Neale", Author))
 
 These commands allow us to narrow our search criteria until we arrive at the desired data. In this example, we will use Body Mass Index (BMI) as an exposure, using genetic instruments identified by [Locke et al (2015)](https://www.nature.com/articles/nature14177).
 
-```{r}
+```{r, eval=F}
 exposure_gwas <- subset(gwas_catalog, grepl("Locke", Author) &
                      Phenotype_simple == "Body mass index")
 
 head(exposure_gwas[,c(7:12,18:21)])
 
+```
+
+```{r, warning=F, message=F, results='hide',echo=FALSE}
+exposure_gwas<-read.csv("exG1.csv",header=T)
 ```
 
 ### Manually selecting specific GWAS estimates for the exposure
@@ -103,7 +111,7 @@ exposure_data<-format_data(exposure_gwas)
 
 Finally, it is important to prune the set of SNPs for LD, as using correlated SNPs can lead to double counting and, as a consequence, biased causal effect estimates. To prune for LD, the `clump_data` function can be used:
 
-```{r,warning=F, results=F,message=F}
+```{r,warning=F, results=F,message=F, eval=F}
 exposure_data<-clump_data(exposure_data, clump_r2 = 0.001)
 ```
 
@@ -115,8 +123,12 @@ Performing the above leaves a total of `r nrow(exposure_data)` independent instr
 
 If the ID number for the exposure of interest is known, it is possible to extract instruments using the `extract_instruments()` function. For example, the [Locke et al (2015)](https://www.nature.com/articles/nature14177) study is ID number $2$, so it is possible to obtain a set of independent instruments by running the following:
 
-```{r,message=F}
+```{r,message=F, eval=F}
 quick_extract<-extract_instruments(2)
+```
+
+```{r, warning=F, message=F, results='hide',echo=FALSE}
+quick_extract<-read.csv("exG2.csv",header=T)
 ```
 
 Note, however, that as this function uses default values the number of instruments may differ compared with manual selection of instruments. In this case, we have `r nrow(quick_extract)` instruments in contrast to the `r nrow(exposure_data)` instruments obtained manually. One reason for this is that the automatic selection includes estimates obtained from a mixed population as opposed to individuals of European ancestry. Both approaches have their merits, though manual selection provides greater control over the criteria used for instrument selection.
@@ -146,7 +158,7 @@ In this example we will select data from UK Biobank (Neale Lab), containing the 
 
 Now that the ID for the desired outcome study is known, we need to extract the set of SNPs corresponding to the instruments we obtained from step 1.
 
-```{r,message=F, warning=F}
+```{r,message=F, warning=F,eval=F}
 outcome_data <- extract_outcome_data(
     snps = exposure_data$SNP, outcomes = "UKB-a:360")
 ```
@@ -162,18 +174,22 @@ The exposure data and outcome data are now obtained, but it is important to harm
 
 To harmonise the exposure and outcome data we can run the following:
 
-```{r,warning=F,message=F}
+```{r,warning=F,message=F,eval=F}
 H_data <- harmonise_data(
     exposure_dat = exposure_data, 
     outcome_dat = outcome_data
 )
 ```
 
+```{r}
+H_data<-BMIdat
+```
+
 ### Duplicate entries
 
 After data harmonisation, users may find that their dataset contains duplicate exposure-outcome summary sets. This can arise, for example, when a GWAS consortium has released multiple results from separate GWAS analyses for the same trait. We recommend that users prune their datasets so that only the exposure-outcome combination with the highested expected power is retained. This can be done by selecting the exposure-outcome summary set with the largest sample size for the outcome, using the power.prune function:
 
-```{r warning=F,message=F,results="hide"}
+```{r warning=F,message=F,results="hide",eval=F}
 H_data<-power.prune(H_data,method.size=F)
 ```
 
