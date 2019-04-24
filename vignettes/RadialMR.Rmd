@@ -1,12 +1,8 @@
 ---
 title: "RadialMR Practical"
 author: "MRC-IEU"
-date: "14 April 2019"
-output: html_vignette
-vignette: >
-  %\VignetteIndexEntry{TEST}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+date: "20 April 2019"
+output: html_document
 ---
 
 ```{r,echo=F,warning=F,message=F,results='hide'}
