@@ -7,7 +7,7 @@ Depends: R (>= 3.3.1)
 License: GPL(>= 2)
 Encoding: UTF-8
 LazyData: true
-Imports: RadialMR, TwoSampleMR, MRInstruments
+Suggests: RadialMR, TwoSampleMR, MRInstruments, knitr, rmarkdown, kableExtra, captioner, stringr
 Remotes: WSpiller/RadialMR,
          MRCIEU/TwoSampleMR,
          MRCIEU/MRInstruments
