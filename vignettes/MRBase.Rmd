@@ -3,8 +3,8 @@ title: "MRBase and TwoSample MR Practical"
 author: "MRC-IEU"
 date: "10 April 2019"
 output: html_vignette
-        fig_width: 6 
-        fig_height: 4 
+fig_width: 6 
+fig_height: 4 
 vignette: >
   %\VignetteIndexEntry{TEST}
   %\VignetteEngine{knitr::rmarkdown}
