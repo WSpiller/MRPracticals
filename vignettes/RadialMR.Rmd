@@ -1,0 +1,251 @@
+---
+title: "RadialMR Practical"
+author: "MRC-IEU"
+date: "20 April 2019"
+output: html_document
+---
+
+```{r,echo=F,warning=F,message=F,results='hide'}
+BMIdat<-read.csv("BMIdat.csv",header=T)
+```
+
+
+## RadialMR Overview
+
+In the previous practical session, we were able to obtain publicly available GWAS data using the MR Base platform, and perform a range of two-sample summary MR analyses. We were also able to perform sensitivity analyses, using heterogeneity in effect estimates obtained using individual SNPs to identify pleiotropic effects. If we assume that heterogeneity is indicative of pleiotropic bias, a logical next step is identifying outliers which are introducing bias into IVW and MR-Egger analyses.
+
+We have written the `RadialMR` R package to produce radial plots and to perform radial regression for inverse variance weighted and MR-Egger regression models. These plots have the advantage of improving the visual detection of outliers, as well as being coding invariant (i.e. We do not require all SNP-exposure associations to be positive). In this practical session we will:
+
+1. Use the `RadialMR` R package to implement radial forms of IVW using data from MR Base.
+
+2. Consider a range of sensitivity analyses, including assessment of Q-statistics and the radial MR-Egger model.
+
+3. Explore data visualisation options.
+
+In this example we will be using a data frame called `BMIdat` which is part of this package. This is obtained using the code from the MR Base practical, representing a formatted and harmonised data frame before MR methods were implemented.
+
+### Installing RadialMR
+
+The `RadialMR` R package would have been automatically installed by the MR_Practicals R package, but can be reinstalled at anytime using the following code:
+
+```{r,warning=F,message=F,results='hide'}
+install.packages("devtools",dependencies=T, repos='http://cran.us.r-project.org')
+library(devtools)
+install_github("WSpiller/RadialMR")
+library(RadialMR)
+```
+
+Note that as `RadialMR` is hosted on Github, installation requires the devtools R package.
+
+### The RadialMR workflow
+
+The workflow for performing a radial two-sample summary MR is as follows:
+
+1. Obtain summary data estimates either independently or through MR Base, formatting the data using the `format_radial()` function.
+2. Fit a radial IVW model using the `ivw_radial()` function.
+3. Fit a radial MR Egger model using the `egger_radial()` function.
+3. Plot the data using the `plot_radial()` and `plotly_radial()` functions.
+
+## Step 1: Obtaining relevant data
+
+To perform a two-sample summary MR, we require a set of SNPs with instrument-exposure and instrument-outcome associations, as well as corresponding standard errors.
+
+Please note that association estimates for binary outcomes should be on the **log odds ratio** scale.
+
+### Using pre-existing data
+
+Previously, we were able to obtain an appropriate dataset from MR Base assessing the effect of body mass index (BMI) upon systolic blood pressure. A copy of this dataset is saved as `BMIdat`, and we can bring up a list of column names for this dataset:
+
+```{r,warning=F,message=F}
+names(BMIdat)
+```
+
+Here the required columns are `beta.exposure`, `beta.outcome`,`se.exposure`
+,`se.outcome`, and `SNP`. To put this data into a format which the `RadialMR` package can understand, we use the `format_radial()` function:
+
+```{r,warning=F,message=F}
+radial_data<-format_radial(BMIdat$beta.exposure,BMIdat$beta.outcome,
+                           BMIdat$se.exposure,BMIdat$se.outcome,
+                           BMIdat$SNP)
+
+head(radial_data)
+```
+
+This will create an object `radial_data` which will be used as the input for fitting radial IVW and MR Egger models. It is also worth noting that the last argument assigns RSID labels to each SNP. If these are not known, leaving the argument blank will cause temporary placeholder values to be created, and a warning message will be displayed.
+
+### Obtaining data from MR Base
+
+As any dataset we obtain from MRBase will have the same format, the code presented is directly applicable to data on other exposure-outcome relationships.
+
+## Step 2: Fitting a Radial IVW model
+
+The `ivw_radial()` function is used to fit a radial IVW model. It takes a formatted data set as the primary input, and provides several further user-defined options.
+
+#### Option 1: Weighting
+
+When fitting a radial IVW model, we can specify whether first order (1), second order (2), or modified second order (3) weights should be used. By default modified second order weights are used, as they are generally more accurate in estimating heterogeneity with respect to each SNP.
+
+#### Option 2: Significance threshold for detecting outliers
+
+A second important option is assigning a significance threshold (p-value for significance) for detecting outliers based on their contribution to global heterogeneity. By default `RadialMR` used a significance threshold of $0.05$, though a more conservative approach would be to perform a multiple testing correction. This is achieved by dividing $0.05$ by the number of SNPs used in the analysis.
+
+#### Option 3: Iteration tolerance
+
+Finally, it is possible to set a tolerance threshold for fitting the iterative radial IVW model. The iterative approach essentially calculates an IVW estimate which is subsequently used to calculate new modified second order weights, repeating the process until the estimates converge within a given tolerance level. The default value is $0.0001$.
+
+### Fitting and interpreting the radial IVW model
+
+Using the above options, we specify the data we wish to analyse (`radial_data`), the desired significance threshold (`0.05/nrow(radial_data)`), modified second order weights (`3`), and an iteration tolerance threshold of `0.0001`. With each of these options considered, we can proceed to fit the radial IVW model using the following code:
+
+```{r,warning=F,message=F}
+ivw.model<-ivw_radial(radial_data,0.05/nrow(radial_data),3,0.0001)
+```
+
+The output from the `ivw_radial()` function presents several useful results. The first row of estimates corresponds to performing IVW with the desired weighting scheme a single time, whilst the second row shows the iterative results. The exact estimates correspond to the fixed-effects (FE) and random effects (RE) models.
+
+Below the IVW estimates the F-statistic for the regression is given, though it is important to note that this is not the same F-statistic used to assess instrument strength, but rather the F-statistic for the IVW regression model.
+
+Next, Cochran's Q-statistic is presented as a measure of global heterogeneity, along with a corresponding p-value. A high Q-statistic and low p-value can be indicative of pleiotropic SNPs contributing to observed heterogeneity in individual SNP effects.
+
+Finally, the results indicate whether outliers were detected at the given significance threshold, as well as the number of iterations performed using the iterative approach.
+
+We can extract elements of these results, for example a dataframe of outliers with their corresponding Q statistics, by using the following code:
+
+```{r message=F,warning=F}
+ivw.model$outliers
+```
+
+A full list and description of available elements which can be extracted can be found by typing `?ivw_radial`.
+
+## Step 3: Fitting a Radial MR Egger model
+
+The `egger_radial()` function is used to fit a radial MR Egger model. The format for using this function is similar to `ivw_radial()` taking a formatted data set as the primary input, and allowing for differing weighting options and significance levels as described above. However, iterative and exact MR Egger approaches are still under development.
+
+To fit the radial MR Egger model, we run the following:
+
+```{r,warning=F,message=F}
+egger.model<-egger_radial(radial_data,0.05/nrow(radial_data),3)
+```
+
+In this case, an intercept and causal effect estimate are presented using the specified weighting. `Wj` represents the weights for the set of SNPs, and coefficient is the estimate for the exposure of interest, in this case, BMI. 
+
+One point of interest is that while the scale for the causal effect is comparable to the conventional MR Egger model, the point estimate for the intercept will differ. This is due to the dependent variable being on a different scale to the conventional model ($\hat{\beta}_j\sqrt{W_j}$) as opposed to the instrument-outcome association scale ($\Gamma_j$). However, inference with respect to deviation from the origin as an indicator of pleiotropy is equivalent, and the corresponding p-values and confidence intervals will therefore be similar.
+
+The summary of results provides the F-statistic for the regression, a global test of heterogeneity using Rucker's Q, and an indicator of whether outliers have been detected. These are interpreted in a similar fashion to the previous IVW analysis.
+
+Finally, we can again extract elements from the MR Egger analysis, such as a dataframe of detected outliers:
+
+```{r message=F,warning=F}
+egger.model$outliers
+```
+
+A full list and description of available elements which can be distracted can be found by typing `?egger_radial`.
+
+## Step 4: Data visualisation.
+
+After fitting radial forms of IVW and MR Egger, it is possible to create a series of plots which can be used for visualising effect estimates and outlier status. In each case, the plots created by `Radial MR` show the estimate from performing the approach with the desired weighting for a single iteration.
+
+### Radial IVW plots
+
+We can initially create a plot for the IVW estimate using the `plot_radial()` function. This takes the model as a primary input, and also provides three additional options, `radial_scale`, `show_outliers`, and `scale_match`.
+
+#### Option 1: radial_scale
+
+The radial_scale option determines whether a reference scale should be presented on the radial plot. As the radial plot projects onto a circle, this will take the form of a black curve with reference points. The option can either be set to `TRUE` or `FALSE`.
+
+#### Option 2: show_outliers
+
+The show_outliers option indicates whether the full set of SNPs should be shown in the plot, or only SNPs identified as outliers. When this option is selected, and `radial_scale=FALSE`, the square root of Q-statistic contribution for each outlier will be presented. This quantifies the extent to which the given SNP is an outlier. The `show_outliers` option can either be set to `TRUE` or `FALSE`.
+
+#### Option 3: scale_match
+
+The scale_match option indicates whether the x and y axes should be on the same scale. This can improve the presentation of plots in some cases. The `scale_match` option can either be set to `TRUE` or `FALSE`.
+
+As an example, we can use the following code to produce a radial IVW plot with a reference scale:
+
+```{r,warning=F,message=F}
+IVWplot1<-plot_radial(ivw.model,T,F,F)
+IVWplot1
+```
+
+And if we are only interested in outliers, we can run:
+
+```{r,warning=F,message=F}
+IVWplot2<-plot_radial(ivw.model,F,T,F)
+IVWplot2
+```
+
+### The interactive IVW plot
+
+A new feature of the `RadialMR` package is the `plotly_radial` function, which produces an interactive radial IVW plot. Using this plot, it is possible to use the mouse to highlight individual SNPs, presenting their RSID numbers for subsequent followup. To create an interactive radial IVW plot, we use the ivw model as an input and run:
+
+```{r,warning=F,message=F}
+IVWplot3<-plotly_radial(ivw.model)
+IVWplot3
+```
+
+### Radial MR Egger plots
+
+To create a radial MR Egger plot, we can use the same `plot_radial()` function as in the IVW case. In this case, each option is the same as described above, so to create corresponding MR Egger plots to the above IVW plots, we use the following:
+
+```{r,warning=F,message=F}
+Eggerplot1<-plot_radial(egger.model,T,F,F)
+Eggerplot1
+```
+
+```{r,warning=F,message=F}
+Eggerplot2<-plot_radial(egger.model,F,T,F)
+Eggerplot2
+```
+
+### Radial IVW and MR Egger plots combined
+
+Finally, it is possible to present both IVW and MR Egger estimates simultaneously. This is achieved using the `plot_radial()` function, using both the IVW and MR Egger models previously defined. Once again the options are as previously described.
+
+To create the combined plot, we include both models using the command `c(ivw.model,egger.model)`. We can then run the following code:
+
+```{r,warning=F,message=F}
+Comboplot1<-plot_radial(c(ivw.model,egger.model),T,F,F)
+Comboplot1
+```
+
+```{r,warning=F,message=F}
+Comboplot2<-plot_radial(c(ivw.model,egger.model),F,T,F)
+Comboplot2
+```
+
+Note that Q-statistics are not presented in the last plot, as the IVW and MR Egger models used differing measures of Q (Cochran and Rucker respectively).
+
+## Outlier followup
+
+A primary feature of RadialMR is the ability to highlight outliers which may be of interest in MR analyses. However, what we do we do once we identify outliers is also of interest.
+
+For example, we could remove outliers identified when fitting the IVW model using the following code:
+
+```{r,warning=F,message=F}
+out_rem<-radial_data[radial_data$SNP %in% ivw.model$outliers$SNP,]
+radial_data2<-radial_data[-c(as.numeric(row.names(out_rem))),]
+ivw.model2<-ivw_radial(radial_data2,0.05/nrow(radial_data2),3,0.0001)
+```
+
+It is worth emphasising, however, that such an approach requires justification, and can potentially lead to a loss of valuable information. Better practice would be to look up outliers using a tool such as Phenoscanner, to see if there is a pattern in the set of phenotypes with which they are associated. If we have instruments for a suspected pleiotropic pathway, we can then fit a multivariable MR model.
+
+##References
+
+Bowden, Jack, George Davey Smith, and Stephen Burgess. 2015. "Mendelian randomization with invalid instruments: effect estimation and bias detection through Egger regression." International Journal of Epidemiology In press.
+
+Bowden, J., et al., Improving the visualization, interpretation and analysis of two-sample summary data Mendelian randomization via the Radial plot and Radial regression. International Journal of Epidemiology, 2018. 47(4): p. 1264-1278.
+
+Davey Smith, G., and S. Ebrahim. 2003. "'Mendelian randomization': can genetic epidemiology contribute to understanding environmental determinants of disease?" International Journal of Epidemiology 32 (1): 1-22.
+
+Davey Smith, George, and Gibran Hemani. 2014. "Mendelian randomization: genetic anchors for causal inference in epidemiological studies." Human Molecular Genetics 23 (R1). Oxford Univ Press: R89--R98.
+
+
+
+
+
+
+
+
+
+

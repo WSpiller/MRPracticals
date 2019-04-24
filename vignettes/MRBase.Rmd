@@ -1,0 +1,285 @@
+---
+title: "MRBase and TwoSample MR Practical"
+author: "MRC-IEU"
+date: "10 April 2019"
+output: html_document
+---
+
+## MR Base Overview
+
+MR Base is an online database and analytical platform for Mendelian randomization, developed by the MRC Integrative Epidemiology Unit at the University of Bristol. It consists of an online web application available at <http://mrbase.org>, and as well as the `MRInstruments` and `TwoSampleMR` R packages. 
+
+In this practical session we will:
+
+1. Extract summary data from the NHGRI-EBI GWAS catalogue.
+2. Perform necessary data formatting.
+3. Implement a range of two-sample summary MR methods.
+
+While we will provide a summary of the online web application, this practical mainly focuses accessing data and performing analyses using the R statistics platform. The practical draws on material presented on the [MR Base](https://mrcieu.github.io/TwoSampleMR/#combine-all-results) website, hosted by the MRC-IEU, University of Bristol.
+
+###Setup
+
+Accessing the NHGRI-EBI GWAS catalogue and necessary data formatting functions requires the `MRInstruments` and `TwoSampleMR` R packages to be installed. These would have been automatically installed by the `MR_Practicals` R package, but can be reinstalled at anytime using the following code:
+
+```{r,warning=FALSE,message=FALSE,results="hide"}
+install.packages("devtools",dependencies=T,repos='http://cran.us.r-project.org')
+library(devtools)
+install_github("MRCIEU/MRInstruments")
+install_github("MRCIEU/TwoSampleMR")
+library(MRInstruments)
+library(TwoSampleMR)
+```
+
+Note that as the `MRInstruments` and `TwoSampleMR` R packages are hosted on Github, installation requires the `devtools` R package.
+
+### MR Workflow
+
+The workflow for performing a two-sample summary MR is as follows:
+
+1. Select instruments for the exposure of interest, and prune for LD.
+2. Extract the instruments from the MR Base GWAS database for the outcomes of interest.
+3. Harmonise the exposure and outcome datasets, with each sample using the same reference alleles.
+4. Perform MR analyses, senstivity analyses, and compile reports.
+
+##Step 1: Obtaining exposure summary estimates
+
+### The GWAS catalog
+The NHGRI-EBI GWAS catalog contains a catalog of significant associations obtained from GWASs. The MR Base version of the data contains harmonised studies with the required data to perform MR, ensuring that the units used to report effect sizes from a particular study are all the same.
+
+To use the GWAS catalogue we can first use the following commands to access a reference dataset containing information on all available exposures:
+
+```{r}
+data(gwas_catalog)
+```
+
+With this reference dataset loaded, we can search for phenotypes of interest using the `grepl()` function. For example, if we want to find phenotypes using the key work "Blood", we can use the following command:
+
+```{r eval=FALSE}
+exposure_gwas <- subset(gwas_catalog, grepl("Blood", Phenotype_simple))
+```
+
+Here, we are searching for the word "Blood" in the simplified phenotypes column of `gwas_catalog` dataset. We can also search for specific studies by author:
+
+```{r eval=FALSE}
+exposure_gwas <- subset(gwas_catalog, grepl("Neale", Author))
+```
+
+These commands allow us to narrow our search criteria until we arrive at the desired data. In this example, we will use Body Mass Index (BMI) as an exposure, using genetic instruments identified by [Locke et al (2015)](https://www.nature.com/articles/nature14177).
+
+```{r}
+exposure_gwas <- subset(gwas_catalog, grepl("Locke", Author) &
+                     Phenotype_simple == "Body mass index")
+
+head(exposure_gwas[,c(7:12,18:21)])
+
+```
+
+### Manually selecting specific GWAS estimates for the exposure
+
+Note that we have multiple entries for each instrument, as sex-specific GWAS data is also available. An explanation of the abbreviations used is available [here](https://www.ebi.ac.uk/gwas/docs/abbreviations). In this case, we are interested in using GWAS conducted on all participants with European ancestry (EA), which is achieved by running the following:
+
+```{r}
+exposure_gwas <- subset(exposure_gwas, grepl("EA", Phenotype_info))
+exposure_gwas <-exposure_gwas[!grepl("women", exposure_gwas$Phenotype_info),]
+exposure_gwas <-exposure_gwas[!grepl("men", exposure_gwas$Phenotype_info),]
+head(exposure_gwas[,c(7:12,18:21)])
+```
+
+Here we have simply removed all sex specific estimates. To ensure our instruments are strong, we have to restrict the set of estimates to associations with a p-value smaller than $5\times10^{-8}$:
+
+```{r}
+exposure_gwas<-exposure_gwas[exposure_gwas$pval<5*10^-8,]
+```
+
+We then use the `format_data()` function to create a dataset which MRBase will use for the MR analysis. The function will also present a warning message if any instruments lack necessary information for conducting the MR analysis.
+
+```{r, warning=F}
+exposure_data<-format_data(exposure_gwas)
+```
+
+Finally, it is important to prune the set of SNPs for LD, as using correlated SNPs can lead to double counting and, as a consequence, biased causal effect estimates. To prune for LD, the `clump_data` function can be used:
+
+```{r,warning=F, results=F,message=F}
+exposure_data<-clump_data(exposure_data, clump_r2 = 0.001)
+```
+
+Note that the threshold for identifying correlated SNPs has been set to the default ($0.001$), though this can be changed if justified. 
+
+Performing the above leaves a total of `r nrow(exposure_data)` independent instruments suitable for subsequent MR analyses.
+
+### Automatically obtaining instruments
+
+If the ID number for the exposure of interest is known, it is possible to extract instruments using the `extract_instruments()` function. For example, the [Locke et al (2015)](https://www.nature.com/articles/nature14177) study is ID number $2$, so it is possible to obtain a set of independent instruments by running the following:
+
+```{r,message=F}
+quick_extract<-extract_instruments(2)
+```
+
+Note, however, that as this function uses default values the number of instruments may differ compared with manual selection of instruments. In this case, we have `r nrow(quick_extract)` instruments in contrast to the `r nrow(exposure_data)` instruments obtained manually. One reason for this is that the automatic selection includes estimates obtained from a mixed population as opposed to individuals of European ancestry. Both approaches have their merits, though manual selection provides greater control over the criteria used for instrument selection.
+
+##Step 2: Obtaining outcome summary estimates
+
+Once instruments for the exposure trait have been specified, those SNPs need to be extracted from the outcome trait. MR Base contains complete GWAS summary statistics from a large number of studies. To obtain details about the available GWASs we can run the following:
+
+```{r,eval=F}
+ao<-available_outcomes()
+head(ao)[,c(3,4,6,8,9,20)]
+```
+
+```{r,echo=F}
+ao<-read.csv("ao.csv",header=T)
+head(ao)[,c(3,4,6,8,9,11,16,20)]
+```
+
+The head function just shows a summary of useful columns that can be used to find an outcome GWAS of interest. As was the case for manually selecting an exposure dataset, we can use similar commands to search for an outcome of interest. For example, to search for systolic blood pressure (SBP):
+
+```{r}
+outcome_gwas <- subset(ao, grepl("Systolic", trait))
+head(outcome_gwas)[,c(3,4,6,8,9,11,16,20)]
+```
+
+In this example we will select data from UK Biobank (Neale Lab), containing the greatest number of genetic variants. This study has the ID number UKB-a:360.
+
+Now that the ID for the desired outcome study is known, we need to extract the set of SNPs corresponding to the instruments we obtained from step 1.
+
+```{r,message=F, warning=F}
+outcome_data <- extract_outcome_data(
+    snps = exposure_data$SNP, outcomes = "UKB-a:360")
+```
+
+In the above we specify the column of SNP rsid numbers from the formatted exposure dataframe, and the ID number for the study containing outcome data.
+
+### A note on LD proxys
+
+By default if a particular requested SNP is not present in the outcome GWAS then a SNP (proxy) that is in LD with the requested SNP (target) will be searched for instead. LD proxies are defined using 1000 genomes European sample data. The effect of the proxy SNP on the outcome is returned, along with the proxy SNP, the effect allele of the proxy SNP, and the corresponding allele (in phase) for the target SNP.
+
+##Step 3: Data Harmonisation
+The exposure data and outcome data are now obtained, but it is important to harmonise the effects. This means that the effect of a SNP on the exposure and the effect of that SNP on the outcome must each correspond to the same allele.
+
+To harmonise the exposure and outcome data we can run the following:
+
+```{r,warning=F,message=F}
+H_data <- harmonise_data(
+    exposure_dat = exposure_data, 
+    outcome_dat = outcome_data
+)
+```
+
+### Duplicate entries
+
+After data harmonisation, users may find that their dataset contains duplicate exposure-outcome summary sets. This can arise, for example, when a GWAS consortium has released multiple results from separate GWAS analyses for the same trait. We recommend that users prune their datasets so that only the exposure-outcome combination with the highested expected power is retained. This can be done by selecting the exposure-outcome summary set with the largest sample size for the outcome, using the power.prune function:
+
+```{r warning=F,message=F,results="hide"}
+H_data<-power.prune(H_data,method.size=F)
+```
+
+## Step 4: Perform MR Analyses
+
+### Obtaining effect estimates
+
+Once the exposure and outcome data are harmonised, we have effect estimates and standard errors for each SNP available for the exposure and outcome traits. We can use this information to perform MR. To do this, simply run:
+
+```{r warning=F,message=F}
+mr_results<-mr(H_data)
+mr_results
+```
+
+In this case, as specific methods haven't been indicated a range of common two-sample summary MR methods have been applied and presented. The set of methods can be narrowed down using the following:
+
+```{r warning=F,message=F}
+mr(H_data, method_list=c("mr_egger_regression", "mr_ivw"))
+```
+
+A full list of available methods can be obtained by running:
+
+```{r warning=F,message=F, eval=F}
+mr_method_list()
+```
+
+```{r warning=F,message=F,}
+head(mr_method_list())[,1:2]
+```
+
+###Generate odds ratios with 95% confidence intervals
+
+In publications it is often useful to report effect estimates on the odds ratio scale for ease of interpretation. When analysing a binary outcome, converting the scale from the log-odds ratio to odds ratio scale is achieved by running the following:
+
+```{r,eval=F}
+generate_odds_ratios(mr_results)
+```
+
+**Note that this analysis uses a continuous outcome**
+
+### Sensitivity analyses
+
+Though a set of effect estimates using a range of methods can be obtained using the `mr()` function, it is useful to evaluate heterogeneity as a measure of possible pleiotropic bias. To test for an average pleiotropic effect, we can assess the extent to which the MR-Egger intercept is non-zero:
+
+```{r warning=F,message=F}
+mr_pleiotropy_test(H_data)
+```
+
+Further, we can obtain Q statistics for heterogeneity with respect to IVW and MR-Egger by running the following:
+
+```{r warning=F,message=F}
+mr_heterogeneity(H_data, method_list=c("mr_egger_regression", "mr_ivw"))
+```
+
+Here we see that the MR-Egger intercept is not significant using a 95% threshold, yet there appears to be heterogeneity between individual SNP estimates at a global level. This is indicated by the Q statistics and corresponding p-values for heterogeneity.
+
+One possible interpretation of these results is some SNPs are pleiotropic, but the average pleiotropic effect is close to zero (and therefore balanced). In follow up analyses we will look at potential outliers based on their contribution to global heterogeneity using the `RadialMR` R package.
+
+### Producing plots of MR results
+
+We can depict the relationship of the SNP effects on the exposure against the SNP effects on the outcome using a scatter plot:
+
+```{r warning=F, message=F,results="hide"}
+plot1 <- mr_scatter_plot(mr_results, H_data)
+plot1
+```
+
+And the plot can be saved using:
+
+```{r,eval=F,results="hide"}
+ggsave(plot1, file="Plot1.png", width=7, height=7)
+```
+
+We can also produce a forest plot using estimates obtained from individual SNPs:
+
+```{r warning=F, message=F,results="hide"}
+res_single <- mr_singlesnp(H_data)
+plot2 <- mr_forest_plot(res_single)
+plot2
+```
+
+And a plot showing results from performing leave-one-out analyses:
+
+```{r warning=F, message=F,results="hide"}
+res_loo <- mr_leaveoneout(H_data)
+plot3 <- mr_leaveoneout_plot(res_loo)
+plot3
+```
+
+Finally, we can produce a funnel plot for assessing heterogeneity:
+
+```{r warning=F, message=F,results="hide"}
+plot4 <- mr_funnel_plot(res_single)
+plot4
+```
+
+Recall that in the case of the funnel plot, assymetry is indicative of directional pleiotropy.
+
+## Advanced features
+
+This practical is designed as an introduction to using MR Base using the `MRInstruments` and `TwoSampleMR` R packages. However, further features are being constantly developed and introduced, which can more detail to MR analyses. For further information, more detailed documentation can be found [here](https://mrcieu.github.io/TwoSampleMR/#combine-all-results).
+
+##References
+
+Bowden, Jack, George Davey Smith, and Stephen Burgess. 2015. "Mendelian randomization with invalid instruments: effect estimation and bias detection through Egger regression." International Journal of Epidemiology In press.
+
+Davey Smith, G., and S. Ebrahim. 2003. "'Mendelian randomization': can genetic epidemiology contribute to understanding environmental determinants of disease?" International Journal of Epidemiology 32 (1): 1-22.
+
+Davey Smith, George, and Gibran Hemani. 2014. "Mendelian randomization: genetic anchors for causal inference in epidemiological studies." Human Molecular Genetics 23 (R1). Oxford Univ Press: R89--R98.
+
+Pierce, Brandon L, and Stephen Burgess. 2013. "Efficient design for Mendelian randomization studies: subsample and 2-sample instrumental variable estimators." American Journal of Epidemiology 178 (7): 1177-84.
+
+
