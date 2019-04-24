@@ -3,8 +3,6 @@ title: "RadialMR Practical"
 author: "MRC-IEU"
 date: "20 April 2019"
 output: html_vignette
-fig_width: 6 
-fig_height: 4 
 vignette: >
   %\VignetteIndexEntry{TEST}
   %\VignetteEngine{knitr::rmarkdown}
@@ -15,6 +13,9 @@ vignette: >
 BMIdat<-read.csv("BMIdat.csv",header=T)
 ```
 
+```{r,echo=F, warning=F, message=F}
+knitr::opts_chunk$set(fig.width=8, fig.height=6) 
+```
 
 ## RadialMR Overview
 

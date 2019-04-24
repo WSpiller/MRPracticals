@@ -3,13 +3,15 @@ title: "MRBase and TwoSample MR Practical"
 author: "MRC-IEU"
 date: "10 April 2019"
 output: html_vignette
-fig_width: 6 
-fig_height: 4 
 vignette: >
   %\VignetteIndexEntry{TEST}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r,echo=F, warning=F, message=F}
+knitr::opts_chunk$set(fig.width=8, fig.height=6) 
+```
 
 ## MR Base Overview
 
