@@ -1,6 +1,7 @@
 # MRPracticals
 
-The `MRPracticals` R package provides necessary information for MR course practical sessions.
+The `MRPracticals` R package provides necessary information for MR course practical sessions. It requires R version 3.4 and R Studio
+for processing vignette files.
 
 Information for two separate pratical sessions is currently included, pertaining to:
 
