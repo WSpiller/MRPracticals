@@ -26,15 +26,10 @@ While we will provide a summary of the online web application, this practical ma
 Accessing the NHGRI-EBI GWAS catalogue and necessary data formatting functions requires the `MRInstruments` and `TwoSampleMR` R packages to be installed. These would have been automatically installed by the `MR_Practicals` R package, but can be reinstalled at anytime using the following code:
 
 ```{r,warning=FALSE,message=FALSE,results="hide"}
-library(MRInstruments)
-library(TwoSampleMR)
-```
-
-```{r,warning=FALSE,message=FALSE,results="hide",eval=F}
-install.packages("devtools",dependencies=T,repos='http://cran.us.r-project.org')
+#install.packages("devtools",dependencies=T,repos='http://cran.us.r-project.org')
 library(devtools)
-install_github("MRCIEU/MRInstruments")
-install_github("MRCIEU/TwoSampleMR")
+#install_github("MRCIEU/MRInstruments")
+#install_github("MRCIEU/TwoSampleMR")
 library(MRInstruments)
 library(TwoSampleMR)
 ```
@@ -116,7 +111,7 @@ exposure_data<-format_data(exposure_gwas)
 
 Finally, it is important to prune the set of SNPs for LD, as using correlated SNPs can lead to double counting and, as a consequence, biased causal effect estimates. To prune for LD, the `clump_data` function can be used:
 
-```{r,warning=F, results=F,message=F, eval=F}
+```{r,warning=F, results=F,message=F,eval=F}
 exposure_data<-clump_data(exposure_data, clump_r2 = 0.001)
 ```
 

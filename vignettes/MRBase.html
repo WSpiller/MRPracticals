@@ -319,10 +319,10 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>While we will provide a summary of the online web application, this practical mainly focuses accessing data and performing analyses using the R statistics platform. The practical draws on material presented on the <a href="https://mrcieu.github.io/TwoSampleMR/#combine-all-results">MR Base</a> website, hosted by the MRC-IEU, University of Bristol.</p>
 <p>###Setup</p>
 <p>Accessing the NHGRI-EBI GWAS catalogue and necessary data formatting functions requires the <code>MRInstruments</code> and <code>TwoSampleMR</code> R packages to be installed. These would have been automatically installed by the <code>MR_Practicals</code> R package, but can be reinstalled at anytime using the following code:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>,<span class="dt">dependencies=</span>T,<span class="dt">repos=</span><span class="st">&#39;http://cran.us.r-project.org&#39;</span>)</a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co">#install.packages(&quot;devtools&quot;,dependencies=T,repos=&#39;http://cran.us.r-project.org&#39;)</span></a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="kw">library</span>(devtools)</a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="kw">install_github</span>(<span class="st">&quot;MRCIEU/MRInstruments&quot;</span>)</a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="kw">install_github</span>(<span class="st">&quot;MRCIEU/TwoSampleMR&quot;</span>)</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="co">#install_github(&quot;MRCIEU/MRInstruments&quot;)</span></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co">#install_github(&quot;MRCIEU/TwoSampleMR&quot;)</span></a>
 <a class="sourceLine" id="cb1-5" title="5"><span class="kw">library</span>(MRInstruments)</a>
 <a class="sourceLine" id="cb1-6" title="6"><span class="kw">library</span>(TwoSampleMR)</a></code></pre></div>
 <p>Note that as the <code>MRInstruments</code> and <code>TwoSampleMR</code> R packages are hosted on Github, installation requires the <code>devtools</code> R package.</p>
@@ -462,16 +462,16 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 5 Systolic blood pressure  automated reading || id:UKB-a:360
 ##          exposure                    method nsnp          b         se
 ## 1 Body mass index                  MR Egger   62 0.03778843 0.06393780
-## 2 Body mass index           Weighted median   62 0.10794749 0.02340846
+## 2 Body mass index           Weighted median   62 0.10794749 0.02266821
 ## 3 Body mass index Inverse variance weighted   62 0.07046435 0.02636638
-## 4 Body mass index               Simple mode   62 0.10996751 0.06157757
-## 5 Body mass index             Weighted mode   62 0.10996751 0.03000177
+## 4 Body mass index               Simple mode   62 0.10996751 0.06186072
+## 5 Body mass index             Weighted mode   62 0.10996751 0.02887844
 ##           pval
 ## 1 5.567279e-01
-## 2 3.998235e-06
+## 2 1.916225e-06
 ## 3 7.528678e-03
-## 4 7.909632e-02
-## 5 5.194079e-04</code></pre>
+## 4 8.044394e-02
+## 5 3.277318e-04</code></pre>
 <p>In this case, as specific methods haven’t been indicated a range of common two-sample summary MR methods have been applied and presented. The set of methods can be narrowed down using the following:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="kw">mr</span>(H_data, <span class="dt">method_list=</span><span class="kw">c</span>(<span class="st">&quot;mr_egger_regression&quot;</span>, <span class="st">&quot;mr_ivw&quot;</span>))</a></code></pre></div>
 <pre><code>##   id.exposure id.outcome
