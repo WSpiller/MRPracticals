@@ -1,6 +1,7 @@
 # MRPracticals
 
-The `MRPracticals` R package provides necessary information for MR course practical sessions. It requires R version 3.4 and R Studio
+The `MRPracticals` R package provides necessary information for MR course practical sessions. It requires R version 3.5 and R Studio to be installed, as well
+as Rtools which is available at https://cran.r-project.org/bin/windows/Rtools/
 for processing vignette files.
 
 Information for two separate pratical sessions is currently included, pertaining to:
@@ -10,7 +11,9 @@ Information for two separate pratical sessions is currently included, pertaining
 
 ## Installation
 
-To install `MRPracticals` directly from the GitHub repository, first make sure you have the `devtools` package installed:
+To install `MRPracticals` directly from the GitHub repository, first make sure you have R version 3.5 or higher, R Studio, and R Tools version 3.5 installed.
+
+Next, open R Studie and install the `devtools` package:
 
     install.packages("devtools")
 
