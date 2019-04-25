@@ -13,9 +13,9 @@ Information for two separate pratical sessions is currently included, pertaining
 
 To install `MRPracticals` directly from the GitHub repository, first make sure you have R version 3.5 or higher, R Studio, and R Tools version 3.5 installed.
 
-Next, open R Studie and install the `devtools` package:
+Next, open R Studio and install the `devtools`, `knitr`, and `rmarkdown` packages:
 
-    install.packages("devtools")
+    install.packages(c("devtools", "knitr", "rmarkdown"))
 
 Then the `MRPracticals` package can be installed using:
 
