@@ -252,7 +252,7 @@ One possible interpretation of these results is some SNPs are pleiotropic, but t
 
 We can depict the relationship of the SNP effects on the exposure against the SNP effects on the outcome using a scatter plot:
 
-```{r warning=F, message=F,results="hide"}
+```{r, fig.width=8, fig.height=6, warning=F, message=F,results="hide"}
 plot1 <- mr_scatter_plot(mr_results, H_data)
 plot1
 ```
@@ -265,7 +265,7 @@ ggsave(plot1, file="Plot1.png", width=7, height=7)
 
 We can also produce a forest plot using estimates obtained from individual SNPs:
 
-```{r warning=F, message=F,results="hide"}
+```{r, fig.width=8, fig.height=6, warning=F, message=F,results="hide"}
 res_single <- mr_singlesnp(H_data)
 plot2 <- mr_forest_plot(res_single)
 plot2
@@ -273,7 +273,7 @@ plot2
 
 And a plot showing results from performing leave-one-out analyses:
 
-```{r warning=F, message=F,results="hide"}
+```{r, fig.width=8, fig.height=6, warning=F, message=F,results="hide"}
 res_loo <- mr_leaveoneout(H_data)
 plot3 <- mr_leaveoneout_plot(res_loo)
 plot3
@@ -281,7 +281,7 @@ plot3
 
 Finally, we can produce a funnel plot for assessing heterogeneity:
 
-```{r warning=F, message=F,results="hide"}
+```{r, fig.width=8, fig.height=6, warning=F, message=F,results="hide"}
 plot4 <- mr_funnel_plot(res_single)
 plot4
 ```

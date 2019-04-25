@@ -166,14 +166,14 @@ The scale_match option indicates whether the x and y axes should be on the same 
 
 As an example, we can use the following code to produce a radial IVW plot with a reference scale:
 
-```{r,warning=F,message=F}
+```{r, fig.width=8, fig.height=6, warning=F,message=F}
 IVWplot1<-plot_radial(ivw.model,T,F,F)
 IVWplot1
 ```
 
 And if we are only interested in outliers, we can run:
 
-```{r,warning=F,message=F}
+```{r, fig.width=8, fig.height=6, warning=F,message=F}
 IVWplot2<-plot_radial(ivw.model,F,T,F)
 IVWplot2
 ```
@@ -182,7 +182,7 @@ IVWplot2
 
 A new feature of the `RadialMR` package is the `plotly_radial` function, which produces an interactive radial IVW plot. Using this plot, it is possible to use the mouse to highlight individual SNPs, presenting their RSID numbers for subsequent followup. To create an interactive radial IVW plot, we use the ivw model as an input and run:
 
-```{r,warning=F,message=F}
+```{r, fig.width=8, fig.height=6, warning=F,message=F}
 IVWplot3<-plotly_radial(ivw.model)
 IVWplot3
 ```
@@ -191,12 +191,12 @@ IVWplot3
 
 To create a radial MR Egger plot, we can use the same `plot_radial()` function as in the IVW case. In this case, each option is the same as described above, so to create corresponding MR Egger plots to the above IVW plots, we use the following:
 
-```{r,warning=F,message=F}
+```{r, fig.width=8, fig.height=6, warning=F,message=F}
 Eggerplot1<-plot_radial(egger.model,T,F,F)
 Eggerplot1
 ```
 
-```{r,warning=F,message=F}
+```{r, fig.width=8, fig.height=6, warning=F,message=F}
 Eggerplot2<-plot_radial(egger.model,F,T,F)
 Eggerplot2
 ```
@@ -207,12 +207,12 @@ Finally, it is possible to present both IVW and MR Egger estimates simultaneousl
 
 To create the combined plot, we include both models using the command `c(ivw.model,egger.model)`. We can then run the following code:
 
-```{r,warning=F,message=F}
+```{r, fig.width=8, fig.height=6, warning=F,message=F}
 Comboplot1<-plot_radial(c(ivw.model,egger.model),T,F,F)
 Comboplot1
 ```
 
-```{r,warning=F,message=F}
+```{r, fig.width=8, fig.height=6, warning=F,message=F}
 Comboplot2<-plot_radial(c(ivw.model,egger.model),F,T,F)
 Comboplot2
 ```
