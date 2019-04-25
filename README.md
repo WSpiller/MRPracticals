@@ -17,6 +17,11 @@ Next, open R Studio and install the `devtools`, `knitr`, and `rmarkdown` package
 
     install.packages(c("devtools", "knitr", "rmarkdown"))
 
+Next, we need to install the `TwoSampleMR` and `MRInstruments` R packages from Github.
+
+    library(devtools)
+    install_github(c("MRCIEU/TwoSampleMR","MRCIEU/MRInstruments"))
+	
 Then the `MRPracticals` package can be installed using:
 
     library(devtools)
