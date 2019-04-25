@@ -4,7 +4,7 @@ author: "MRC-IEU"
 date: "20 April 2019"
 output: html_vignette
 vignette: >
-  %\VignetteIndexEntry{TEST}
+  %\VignetteIndexEntry{RadialMR Practical}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
