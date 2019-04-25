@@ -10,6 +10,7 @@ vignette: >
 ---
 
 ```{r,echo=F,warning=F,message=F,results='hide'}
+library(RadialMR)
 BMIdat<-read.csv("BMIdat.csv",header=T)
 ```
 
@@ -31,7 +32,7 @@ In this example we will be using a data frame called `BMIdat` which is part of t
 
 The `RadialMR` R package would have been automatically installed by the MR_Practicals R package, but can be reinstalled at anytime using the following code:
 
-```{r,warning=F,message=F,results='hide'}
+```{r,warning=F,message=F,results='hide', eval=F}
 install.packages("devtools",dependencies=T, repos='http://cran.us.r-project.org')
 library(devtools)
 install_github("WSpiller/RadialMR")
