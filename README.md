@@ -2,7 +2,7 @@
 
 The `MRPracticals` R package provides necessary information for MR course practical sessions. It requires R version 3.5 and R Studio to be installed, as well
 as Rtools which is available at https://cran.r-project.org/bin/windows/Rtools/
-for processing vignette files.
+for processing vignette files. It is also necessary to have a google account for MR Base authorisation.
 
 Information for two separate pratical sessions is currently included, pertaining to:
 

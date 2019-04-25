@@ -21,7 +21,7 @@ In this practical session we will:
 
 While we will provide a summary of the online web application, this practical mainly focuses accessing data and performing analyses using the R statistics platform. The practical draws on material presented on the [MR Base](https://mrcieu.github.io/TwoSampleMR/#combine-all-results) website, hosted by the MRC-IEU, University of Bristol.
 
-###Setup
+### Setup
 
 Accessing the NHGRI-EBI GWAS catalogue and necessary data formatting functions requires the `MRInstruments` and `TwoSampleMR` R packages to be installed. These would have been automatically installed by the `MR_Practicals` R package, but can be reinstalled at anytime using the following code:
 
@@ -49,7 +49,7 @@ The workflow for performing a two-sample summary MR is as follows:
 3. Harmonise the exposure and outcome datasets, with each sample using the same reference alleles.
 4. Perform MR analyses, senstivity analyses, and compile reports.
 
-##Step 1: Obtaining exposure summary estimates
+## Step 1: Obtaining exposure summary estimates
 
 ### The GWAS catalog
 The NHGRI-EBI GWAS catalog contains a catalog of significant associations obtained from GWASs. The MR Base version of the data contains harmonised studies with the required data to perform MR, ensuring that the units used to report effect sizes from a particular study are all the same.
@@ -117,7 +117,7 @@ exposure_data<-clump_data(exposure_data, clump_r2 = 0.001)
 
 Note that the threshold for identifying correlated SNPs has been set to the default ($0.001$), though this can be changed if justified. 
 
-Performing the above leaves a total of `r nrow(exposure_data)` independent instruments suitable for subsequent MR analyses.
+Performing the above leaves a total of 62 independent instruments suitable for subsequent MR analyses.
 
 ### Automatically obtaining instruments
 
@@ -131,9 +131,9 @@ quick_extract<-extract_instruments(2)
 quick_extract<-read.csv("exG2.csv",header=T)
 ```
 
-Note, however, that as this function uses default values the number of instruments may differ compared with manual selection of instruments. In this case, we have `r nrow(quick_extract)` instruments in contrast to the `r nrow(exposure_data)` instruments obtained manually. One reason for this is that the automatic selection includes estimates obtained from a mixed population as opposed to individuals of European ancestry. Both approaches have their merits, though manual selection provides greater control over the criteria used for instrument selection.
+Note, however, that as this function uses default values the number of instruments may differ compared with manual selection of instruments. In this case, we have `r nrow(quick_extract)` instruments in contrast to the 62 instruments obtained manually. One reason for this is that the automatic selection includes estimates obtained from a mixed population as opposed to individuals of European ancestry. Both approaches have their merits, though manual selection provides greater control over the criteria used for instrument selection.
 
-##Step 2: Obtaining outcome summary estimates
+## Step 2: Obtaining outcome summary estimates
 
 Once instruments for the exposure trait have been specified, those SNPs need to be extracted from the outcome trait. MR Base contains complete GWAS summary statistics from a large number of studies. To obtain details about the available GWASs we can run the following:
 
@@ -146,6 +146,8 @@ head(ao)[,c(3,4,6,8,9,20)]
 ao<-read.csv("ao.csv",header=T)
 head(ao)[,c(3,4,6,8,9,11,16,20)]
 ```
+
+**Note that when data from MR Base is accessed, a window will pop up requiring you to sign in to a google account for authorization. Please sign in, after which the analyses can continue.**
 
 The head function just shows a summary of useful columns that can be used to find an outcome GWAS of interest. As was the case for manually selecting an exposure dataset, we can use similar commands to search for an outcome of interest. For example, to search for systolic blood pressure (SBP):
 
@@ -181,7 +183,7 @@ H_data <- harmonise_data(
 )
 ```
 
-```{r}
+```{r, echo=F}
 H_data<-BMIdat
 ```
 
@@ -193,7 +195,7 @@ After data harmonisation, users may find that their dataset contains duplicate e
 H_data<-power.prune(H_data,method.size=F)
 ```
 
-## Step 4: Perform MR Analyses
+## Step 3: Perform MR Analyses
 
 ### Obtaining effect estimates
 
@@ -220,7 +222,7 @@ mr_method_list()
 head(mr_method_list())[,1:2]
 ```
 
-###Generate odds ratios with 95% confidence intervals
+### Generate odds ratios with 95% confidence intervals
 
 In publications it is often useful to report effect estimates on the odds ratio scale for ease of interpretation. When analysing a binary outcome, converting the scale from the log-odds ratio to odds ratio scale is achieved by running the following:
 
@@ -257,12 +259,6 @@ plot1 <- mr_scatter_plot(mr_results, H_data)
 plot1
 ```
 
-And the plot can be saved using:
-
-```{r,eval=F,results="hide"}
-ggsave(plot1, file="Plot1.png", width=7, height=7)
-```
-
 We can also produce a forest plot using estimates obtained from individual SNPs:
 
 ```{r, fig.width=8, fig.height=6, warning=F, message=F,results="hide"}
@@ -292,7 +288,7 @@ Recall that in the case of the funnel plot, assymetry is indicative of direction
 
 This practical is designed as an introduction to using MR Base using the `MRInstruments` and `TwoSampleMR` R packages. However, further features are being constantly developed and introduced, which can more detail to MR analyses. For further information, more detailed documentation can be found [here](https://mrcieu.github.io/TwoSampleMR/#combine-all-results).
 
-##References
+## References
 
 Bowden, Jack, George Davey Smith, and Stephen Burgess. 2015. "Mendelian randomization with invalid instruments: effect estimation and bias detection through Egger regression." International Journal of Epidemiology In press.
 
