@@ -2,7 +2,7 @@
 title: "RadialMR Practical"
 author: "MRC-IEU"
 date: "20 April 2019"
-output: html_vignette
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{RadialMR Practical}
   %\VignetteEngine{knitr::rmarkdown}
