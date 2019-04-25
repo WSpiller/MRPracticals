@@ -25,7 +25,7 @@ While we will provide a summary of the online web application, this practical ma
 
 Accessing the NHGRI-EBI GWAS catalogue and necessary data formatting functions requires the `MRInstruments` and `TwoSampleMR` R packages to be installed. These would have been automatically installed by the `MR_Practicals` R package, but can be reinstalled at anytime using the following code:
 
-```{r,warning=FALSE,message=FALSE,results="hide"}
+```{r,warning=FALSE,message=FALSE,results="hide",eval=F}
 install.packages("devtools",dependencies=T,repos='http://cran.us.r-project.org')
 library(devtools)
 install_github("MRCIEU/MRInstruments")
