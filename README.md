@@ -7,7 +7,7 @@ for processing vignette files.
 Information for two separate pratical sessions is currently included, pertaining to:
 
 1. MR Base
-2. The Radial MR package
+2. The RadialMR package
 
 ## Installation
 
