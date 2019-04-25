@@ -13,10 +13,6 @@ vignette: >
 BMIdat<-read.csv("BMIdat.csv",header=T)
 ```
 
-```{r,echo=F, warning=F, message=F}
-knitr::opts_chunk$set(fig.width=8, fig.height=6) 
-```
-
 ## RadialMR Overview
 
 In the previous practical session, we were able to obtain publicly available GWAS data using the MR Base platform, and perform a range of two-sample summary MR analyses. We were also able to perform sensitivity analyses, using heterogeneity in effect estimates obtained using individual SNPs to identify pleiotropic effects. If we assume that heterogeneity is indicative of pleiotropic bias, a logical next step is identifying outliers which are introducing bias into IVW and MR-Egger analyses.

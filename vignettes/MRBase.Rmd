@@ -9,10 +9,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r,echo=F, warning=F, message=F}
-knitr::opts_chunk$set(fig.width=8, fig.height=6) 
-```
-
 ## MR Base Overview
 
 MR Base is an online database and analytical platform for Mendelian randomization, developed by the MRC Integrative Epidemiology Unit at the University of Bristol. It consists of an online web application available at <http://mrbase.org>, and as well as the `MRInstruments` and `TwoSampleMR` R packages. 
