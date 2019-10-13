@@ -25,7 +25,7 @@ Next, we need to install the `TwoSampleMR` and `MRInstruments` R packages from G
 Then the `MRPracticals` package can be installed using:
 
     library(devtools)
-    install_github("WSpiller/MRPracticals",build_opts = c("--no-resave-data", "--no-manual"))
+    install_github("WSpiller/MRPracticals",build_opts = c("--no-resave-data", "--no-manual"),build_vignettes = TRUE)
     
 To update the package just run the `install_github("WSpiller/MRPracticals", build_opts = c("--no-resave-data", "--no-manual"))` command again.
 
