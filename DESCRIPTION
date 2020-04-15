@@ -3,7 +3,7 @@ Title: An R Package illustrating features of MR Base and RadialMR
 Version: 0.0.1
 Authors@R: c(person("Wes", "Spiller", email = "wes.spiller@bristol.ac.uk", role = c("aut", "cre")), person("Jack", "Bowden", email = "jack.bowden@bristol.ac.uk", role = c("aut")))
 Description: This package is designed to present information and guidance for MR practical sessions, designed by the MRC Integrative Epidemiology Unit at the University of Bristol.
-Depends: R (>= 3.3.1)
+Depends: R (>= 3.5.1)
 License: GPL(>= 2)
 Encoding: UTF-8
 LazyData: true
