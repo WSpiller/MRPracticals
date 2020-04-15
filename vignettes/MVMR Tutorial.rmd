@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r echo=F, results='hide'}
+library(devtools)
 install_github("WSpiller/MVMR")
 library(MVMR)
 
