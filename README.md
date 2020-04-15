@@ -8,6 +8,7 @@ Information for two separate pratical sessions is currently included, pertaining
 
 1. MR Base
 2. The RadialMR package
+3. The MVMR package
 
 ## Installation
 
@@ -35,7 +36,9 @@ The `MRPracticals` package contains a sample data frame, and two vignette files 
 
 1. Running the command `vignette("MRBase")` will display a document giving a detailed description of the MR Base practical.
 
-1. Running the command `vignette("RadialMR")` will display a document giving a detailed description of the RadialMR practical.
+2. Running the command `vignette("RadialMR")` will display a document giving a detailed description of the RadialMR practical.
+
+3. Running the command `vignette("MVMR Tutorial")` will display a document giving a detailed description of the MVMR practical.
 
 ## Acknowledgments
 

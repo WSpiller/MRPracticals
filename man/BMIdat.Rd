@@ -4,7 +4,9 @@
 \name{BMIdat}
 \alias{BMIdat}
 \title{Example Two-Sample Summary Data for use in MR Practicals.}
-\format{A data frame with 62 rows and 43 variables, created using code presented in \code{vignette("MRBase")}.}
+\format{
+A data frame with 62 rows and 43 variables, created using code presented in \code{vignette("MRBase")}.
+}
 \source{
 \itemize{
 \item \url{https://www.nature.com/articles/nature14177}
