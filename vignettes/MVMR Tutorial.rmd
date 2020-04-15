@@ -12,6 +12,11 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+```{r,warning=F,message=F,results='hide', eval=F}
+install.packages("devtools",dependencies=T, repos='http://cran.us.r-project.org')
+library(devtools)
+install_github("WSpiller/MVMR")
 library(MVMR)
 ```
 
