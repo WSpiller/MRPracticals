@@ -9,6 +9,7 @@ Encoding: UTF-8
 LazyData: true
 Imports: knitr, rmarkdown, RadialMR, kableExtra, captioner, stringr, MRInstruments, TwoSampleMR, plotly
 Remotes: WSpiller/RadialMR,
+         WSpiller/MVMR,
          MRCIEU/TwoSampleMR,
          MRCIEU/MRInstruments
 VignetteBuilder: knitr
